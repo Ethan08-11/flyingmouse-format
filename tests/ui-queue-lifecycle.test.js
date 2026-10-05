@@ -8,7 +8,7 @@ const source = fs.readFileSync(path.join(__dirname, "..", "public", "app.js"), "
 const resetSource = source.slice(source.indexOf("function resetDownload()"), source.indexOf("let capabilityRefreshTimer;"));
 const targetLabelSource = source.slice(source.indexOf("function targetFormatLabel("), source.indexOf("function commonTargetsFrom("));
 const conversionSource = source.slice(source.indexOf("async function acceptFiles("), source.indexOf("async function saveResult("));
-const selectionEvents = source.slice(source.indexOf('dropZone.addEventListener("click"'), source.indexOf('batchList.addEventListener("click"'));
+const selectionEvents = source.slice(source.indexOf("function openFilePicker("), source.indexOf('batchList.addEventListener("click"'));
 
 function deferred() {
   let resolve, reject;
@@ -22,7 +22,7 @@ function harness({ targets, convert } = {}) {
   const statuses = [], convertedNames = [], forms = [];
   const element = () => ({ hidden: false, disabled: false, value: "", textContent: "", options: [],
     listeners: {}, addEventListener(name, callback) { this.listeners[name] = callback; }, click() { this.clickCount = (this.clickCount || 0) + 1; },
-    removeAttribute() {}, replaceChildren() { this.options = []; this.value = ""; },
+    remove() {}, removeAttribute() {}, replaceChildren() { this.options = []; this.value = ""; },
     append(option) { this.options.push(option); if (!this.value) this.value = option.value; },
     setAttribute() {}, classList: { add() {}, remove() {} } });
   const context = vm.createContext({
@@ -39,7 +39,7 @@ function harness({ targets, convert } = {}) {
     syncVideoCodecField() {}, syncTextEncodingField() {}, usesTextEncoding:()=>false, syncPdfActionFields() {}, syncImagePdfModeField() {}, syncPdfExcelHint() {},
     setBatchResult(index, patch) { state.batchResults[index] = { ...state.batchResults[index], ...patch }; },
     setSelectPlaceholder(select, value) { select.replaceChildren(); select.value = value; },
-    document: { createElement: () => element() },
+    document: { createElement: () => element(), body: { appendChild() {}, } },
     FormData: class { constructor() { this.fields = new Map(); } append(key, value) { this.fields.set(key, value); } },
     fetch: async (_url, { body }) => {
       const file = body.fields.get("file");
@@ -49,7 +49,7 @@ function harness({ targets, convert } = {}) {
       return { ok: true, text: async () => JSON.stringify(result) };
     }
   });
-  for (const name of ["fileInput", "folderInput", "dropZone", "chooseFolderButton", "clearButton", "fileName", "fileMeta", "fileStrip",
+  for (const name of ["fileInput", "folderInput", "dropZone", "chooseFilesButton", "chooseFolderButton", "clearButton", "fileName", "fileMeta", "fileStrip",
     "batchList", "targetSelect", "convertButton", "downloadButton", "batchSaveButton", "previewButton", "videoCodec", "alphaBackground",
     "pdfPassword", "pdfAction", "pdfSplitMode", "pdfGroupSize", "imagePdfMode", "textEncoding", "textEncodingField"]) context[name] = element();
   context.targetSelect.disabled = true;
@@ -124,8 +124,8 @@ test("conversion freezes selection and format controls until the batch settles",
   const app = harness({ convert: () => pending.promise });
   await app.accept([{ name: "one.txt", size: 1 }]);
   const running = app.convert();
-  const controls = ["fileInput", "folderInput", "dropZone", "chooseFolderButton", "clearButton", "videoCodec", "alphaBackground",
-    "pdfPassword", "pdfAction", "pdfSplitMode", "pdfGroupSize", "imagePdfMode"];
+  const controls = ["fileInput", "folderInput", "dropZone", "chooseFilesButton", "chooseFolderButton", "clearButton", "videoCodec", "alphaBackground",
+    "pdfPassword", "pdfAction", "pdfSplitMode", "pdfGroupSize", "imagePdfMode", "textEncoding"];
   for (const control of controls) assert.equal(app.context[control].disabled, true, control);
   pending.resolve({ fileName: "one.md", downloadUrl: "/downloads/one" });
   await running;

@@ -36,14 +36,13 @@ test("renderer exposes workflow hooks and drop zone copy", () => {
   assert.match(html, /id="dropHint"/);
 });
 
-test("renderer restores the original mouse mascot and keeps the sponsor widget", () => {
+test("renderer restores the original mouse mascot without a sponsor widget", () => {
   const html = readPublic("index.html");
   const app = readPublic("app.js");
   assert.match(html, /mouse-mascot|mouseMascot/);
-  assert.match(html, /sponsorWidget|sponsorToggle/);
-  assert.match(html, /sponsor-qr\.jpg/);
+  assert.doesNotMatch(html, /sponsorWidget|sponsorToggle|sponsor-qr\.jpg/);
   assert.match(app, /setMouseState|mouseAssets|mouseMascot/);
-  assert.match(app, /sponsorToggle/);
+  assert.doesNotMatch(app, /sponsorToggle|sponsorWidget|setSponsorOpen/);
   assert.doesNotMatch(html, /3465177342@qq\.com/);
 });
 
@@ -61,7 +60,7 @@ test("original mouse visual theme classes are present", () => {
   assert.match(css, /\.workflow-steps/);
   assert.match(css, /\.mouse-stage/);
   assert.match(css, /\.mouse-mascot/);
-  assert.match(css, /\.sponsor-widget/);
+  assert.doesNotMatch(css, /\.sponsor-widget/);
   assert.match(css, /border-radius:\s*var\(--radius\)/);
 });
 
@@ -255,10 +254,17 @@ test("folder-to-PDF entry is exposed bilingually with webkitdirectory input", ()
   const app = readPublic("app.js");
   const css = readPublic("styles.css");
   assert.match(html, /id="folderInput"[^>]*webkitdirectory/);
+  assert.match(html, /id="chooseFilesButton"/);
   assert.match(html, /id="chooseFolderButton"/);
+  assert.doesNotMatch(html, /<button class="drop-zone"/);
+  assert.match(app, /"upload\.chooseFiles": "选择文件"/);
+  assert.match(app, /"upload\.chooseFiles": "Choose files"/);
   assert.match(app, /"upload\.chooseFolder": "选择文件夹转 PDF"/);
   assert.match(app, /"upload\.chooseFolder": "Choose folder → PDF"/);
-  assert.match(app, /chooseFolderButton\.addEventListener\("click", \(\) => \{ if \(!state\.isConverting\) folderInput\.click\(\); \}\)/);
+  assert.match(app, /function openFilePicker\(/);
+  assert.match(app, /function openFolderPicker\(/);
+  assert.match(app, /chooseFolderButton\.addEventListener\("click"/);
+  assert.match(app, /event\?\.stopPropagation\(\)/);
   assert.match(app, /folderInput\.addEventListener\("change"/);
   assert.match(app, /state\.folderName/);
   assert.match(app, /webkitRelativePath/);

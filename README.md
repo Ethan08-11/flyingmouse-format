@@ -206,9 +206,3 @@ The Windows installer is unsigned and may trigger SmartScreen. Windows 10, other
 完整条款见 [LICENSE](LICENSE)。/ Full terms in [LICENSE](LICENSE).
 
 发现任何渠道倒卖本软件，欢迎通过 GitHub Issues 联系作者举报。
-
-## Support / 支持
-
-FlyingMouse Format is free, offline, and has no ads. If it helped you, you can buy Mouse a dried fish — completely optional. / 飞鼠格式免费、离线、无广告。如果它帮到了你，欢迎请鼠鼠吃根小鱼干，纯自愿。
-
-![WeChat payment QR / 微信收款码](public/assets/sponsor-qr.jpg)

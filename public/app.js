@@ -51,6 +51,7 @@ window.addEventListener("unhandledrejection", (event) => {
 
 const fileInput = document.querySelector("#fileInput");
 const folderInput = document.querySelector("#folderInput");
+const chooseFilesButton = document.querySelector("#chooseFilesButton");
 const chooseFolderButton = document.querySelector("#chooseFolderButton");
 const dropZone = document.querySelector("#dropZone");
 const fileStrip = document.querySelector("#fileStrip");
@@ -130,7 +131,8 @@ const messages = {
     "preview.tooLarge": "文本文件超过 2 MB，为避免界面卡顿，请保存后查看。", "preview.failed": "预览失败：{message}",
     "workflow.aria": "转换流程", "workflow.select": "选择文件", "workflow.analyze": "识别格式",
     "workflow.convert": "开始转换", "workflow.save": "保存结果", "upload.aria": "上传文件",
-    "upload.title": "把文件丢给鼠鼠", "upload.hint": "图片、文档、PDF、WPS、音视频都可以试", "upload.chooseFolder": "选择文件夹转 PDF",
+    "upload.title": "把文件丢给鼠鼠", "upload.hint": "图片、文档、PDF、WPS、音视频都可以试",
+    "upload.chooseFiles": "选择文件", "upload.chooseFolder": "选择文件夹转 PDF", "upload.dropAria": "选择文件",
     "upload.limited": "PDF 表格可以转 Excel；Office/WPS 需要内置 LibreOffice",
     "upload.markdownLimited": "Markdown 转 Word/PDF 暂不可用：文档引擎缺失或无法启动，请修复安装。",
     "action.clear": "清空", "action.convert": "开始转换", "action.download": "下载转换后的文件",
@@ -155,9 +157,6 @@ const messages = {
     "textEncoding.hint": "自动仅识别 UTF-8 或带 BOM 的 UTF-16。GBK 文本请手动选择；批量文本使用同一编码。",
     "formats.aria": "支持格式", "formats.title": "当前支持",
     "formats.description": "文档转换会尽量保留排版；PDF 可导出页面图片，图片和扫描版 PDF 可 OCR 转 TXT。音频仅支持普通格式转换（MP3/WAV/FLAC/AAC/OGG 等），不支持其他音乐平台的加密特殊格式。",
-    "sponsor.aria": "支持鼠鼠", "sponsor.close": "收起", "sponsor.title": "请鼠鼠吃小鱼干 🐟",
-    "sponsor.description": "本软件永久免费。如果帮到了你，欢迎请鼠鼠吃根小鱼干～纯自愿。若有人收费售卖本软件，那一定是套壳圈钱的骗子，请勿上当。",
-    "sponsor.qrAlt": "微信收款码",
     "feedback.label": "问题反馈", "feedback.hint": "如需帮助，请导出诊断报告并查看错误提示。",
     "feedback.guide": "问题反馈：转换遇到问题，请导出诊断报告并查看错误提示，帮助信息详见软件说明。",
     "tutorial.close": "关闭",
@@ -181,7 +180,8 @@ const messages = {
     "preview.tooLarge": "This text file is larger than 2 MB. Save it to view without slowing the app.", "preview.failed": "Preview failed: {message}",
     "workflow.aria": "Conversion workflow", "workflow.select": "Select files", "workflow.analyze": "Detect format",
     "workflow.convert": "Convert", "workflow.save": "Save results", "upload.aria": "Upload files",
-    "upload.title": "Drop files to Mouse", "upload.hint": "Try images, documents, PDF, WPS, audio, or video", "upload.chooseFolder": "Choose folder → PDF",
+    "upload.title": "Drop files to Mouse", "upload.hint": "Try images, documents, PDF, WPS, audio, or video",
+    "upload.chooseFiles": "Choose files", "upload.chooseFolder": "Choose folder → PDF", "upload.dropAria": "Choose files",
     "upload.limited": "PDF tables can be converted to Excel; Office/WPS needs bundled LibreOffice",
     "upload.markdownLimited": "Markdown to Word/PDF is unavailable: the document engine is missing or cannot start. Repair the installation.",
     "action.clear": "Clear", "action.convert": "Convert", "action.download": "Download converted file",
@@ -206,9 +206,6 @@ const messages = {
     "textEncoding.hint": "Auto accepts UTF-8 or UTF-16 with a BOM. Select GBK manually for GBK text. All text files in a batch use this encoding.",
     "formats.aria": "Supported formats", "formats.title": "Supported now",
     "formats.description": "Document conversion preserves layout where possible; PDFs can export page images, and images and scanned PDFs can be OCRed to TXT. Audio supports only ordinary formats (MP3/WAV/FLAC/AAC/OGG etc.); encrypted formats from music platforms are not supported.",
-    "sponsor.aria": "Support Mouse", "sponsor.close": "Close", "sponsor.title": "Buy Mouse a dried fish 🐟",
-    "sponsor.description": "This app is permanently free. If it helped you, you can buy Mouse a snack — completely optional. If anyone charges you for this app, it's a scam.",
-    "sponsor.qrAlt": "WeChat payment QR code",
     "feedback.label": "Feedback", "feedback.hint": "For help, export the diagnostics report and check the error details.",
     "feedback.guide": "Feedback: if a conversion fails, export the diagnostics report and check the error details. Help is described in the app documentation.",
     "tutorial.close": "Close",
@@ -1210,7 +1207,7 @@ function setConversionBusy(busy) {
   state.isConverting = busy;
   // Freeze every selection path, including hidden inputs and native keyboard
   // activation. A clear action is not a backend conversion cancellation.
-  for (const control of [fileInput, folderInput, dropZone, chooseFolderButton, clearButton,
+  for (const control of [fileInput, folderInput, dropZone, chooseFilesButton, chooseFolderButton, clearButton,
     videoCodec, alphaBackground, pdfPassword, pdfAction, pdfSplitMode, pdfGroupSize, imagePdfMode, textEncoding]) {
     if (control) control.disabled = busy;
   }
@@ -1511,7 +1508,41 @@ async function saveAllConvertedFiles() {
   }
 }
 
-dropZone.addEventListener("click", () => { if (!state.isConverting) fileInput.click(); });
+function openFilePicker() {
+  if (state.isConverting) return;
+  // Fresh input avoids Chromium/Electron reusing the last webkitdirectory folder dialog.
+  const input = document.createElement("input");
+  input.type = "file";
+  input.multiple = true;
+  input.className = "sr-only";
+  input.addEventListener("change", () => {
+    if (input.files?.length) acceptFiles(input.files);
+    input.remove();
+  }, { once: true });
+  document.body.appendChild(input);
+  input.click();
+}
+
+function openFolderPicker() {
+  if (state.isConverting) return;
+  const input = document.createElement("input");
+  input.type = "file";
+  input.className = "sr-only";
+  input.setAttribute("webkitdirectory", "");
+  input.addEventListener("change", () => {
+    if (input.files?.length) acceptFiles(input.files);
+    input.remove();
+  }, { once: true });
+  document.body.appendChild(input);
+  input.click();
+}
+
+dropZone.addEventListener("click", () => { openFilePicker(); });
+dropZone.addEventListener("keydown", (event) => {
+  if (event.key !== "Enter" && event.key !== " ") return;
+  event.preventDefault();
+  openFilePicker();
+});
 
 dropZone.addEventListener("dragover", (event) => {
   event.preventDefault();
@@ -1576,9 +1607,16 @@ fileInput.addEventListener("change", () => {
   acceptFiles(fileInput.files);
 });
 
-// 选择文件夹：webkitdirectory input 的每个 File 带 webkitRelativePath
-// （如 "相册2026/001.jpg"），acceptFiles 用第一个路径段做文件夹名。
-chooseFolderButton.addEventListener("click", () => { if (!state.isConverting) folderInput.click(); });
+chooseFilesButton.addEventListener("click", (event) => {
+  event?.stopPropagation();
+  openFilePicker();
+});
+
+// 选择文件夹：webkitdirectory 对话框只能选目录。文件请点「选择文件」或投递区。
+chooseFolderButton.addEventListener("click", (event) => {
+  event?.stopPropagation();
+  openFolderPicker();
+});
 folderInput.addEventListener("change", () => {
   if (folderInput.files?.length) {
     acceptFiles(folderInput.files);
@@ -1888,21 +1926,3 @@ initializeApp().catch((error) => {
   logBridge.rendererReady?.().catch(error => rendererLog("warn", "界面就绪通知失败", error));
 });
 
-// 打赏组件（微信收款码，纯自愿）
-const sponsorToggle = document.querySelector("#sponsorToggle");
-const sponsorPanel = document.querySelector("#sponsorPanel");
-const sponsorClose = document.querySelector("#sponsorClose");
-const sponsorWidget = document.querySelector("#sponsorWidget");
-
-function setSponsorOpen(open) {
-  sponsorPanel.hidden = !open;
-  sponsorToggle.setAttribute("aria-expanded", String(open));
-}
-
-if (sponsorToggle && sponsorPanel && sponsorClose && sponsorWidget) {
-  sponsorToggle.addEventListener("click", () => setSponsorOpen(sponsorPanel.hidden));
-  sponsorClose.addEventListener("click", () => setSponsorOpen(false));
-  document.addEventListener("click", (event) => {
-    if (!sponsorPanel.hidden && !sponsorWidget.contains(event.target)) setSponsorOpen(false);
-  });
-}

@@ -43,7 +43,7 @@ function harness() {
       return { ok: true, text: async () => JSON.stringify({ fileName: "output.pdf", downloadUrl: "/downloads/output" }) };
     }
   });
-  for (const name of ["fileInput", "folderInput", "dropZone", "chooseFolderButton", "clearButton", "fileName", "fileMeta", "fileStrip",
+  for (const name of ["fileInput", "folderInput", "dropZone", "chooseFilesButton", "chooseFolderButton", "clearButton", "fileName", "fileMeta", "fileStrip",
     "batchList", "targetSelect", "convertButton", "downloadButton", "batchSaveButton", "previewButton", "videoCodec", "alphaBackground",
     "pdfPassword", "pdfAction", "pdfSplitMode", "pdfGroupSize", "imagePdfMode", "textEncoding", "textEncodingField", "cancelConversionButton", "progressLabel",
     "pdfPasswordField", "pdfActionField", "pdfSplitModeField", "pdfGroupSizeField", "imagePdfModeField",

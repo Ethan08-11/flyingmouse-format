@@ -7,6 +7,8 @@ const fsp = require("node:fs/promises");
 const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
+const { spawn } = require("node:child_process");
+const { once } = require("node:events");
 const { test } = require("node:test");
 
 const {
@@ -28,6 +30,25 @@ async function touch(filePath, { ageMs = 0, content = "x" } = {}) {
   await fsp.writeFile(filePath, content);
   const when = new Date(Date.now() - ageMs);
   await fsp.utimes(filePath, when, when);
+}
+
+async function exitedRuntimePids() {
+  // Keep both children alive until allocated so their PIDs cannot be reused
+  // between fixtures. Fixed PIDs may belong to a real process on a CI runner.
+  const children = Array.from({ length: 2 }, () => spawn(
+    process.execPath, ["-e", "process.stdin.resume()"], { stdio: "pipe" }
+  ));
+  const exits = children.map((child) => once(child, "close"));
+  for (const child of children) child.stdin.end();
+  const results = await Promise.all(exits);
+  for (const [index, child] of children.entries()) {
+    assert.equal(results[index][0], 0, "fixture process must exit successfully");
+    assert.ok(child.pid > 0, "fixture must have a real PID");
+    assert.throws(() => process.kill(child.pid, 0), { code: "ESRCH" },
+      "fixture process must have exited before cleanup");
+  }
+  assert.notEqual(children[0].pid, children[1].pid);
+  return children.map((child) => child.pid);
 }
 
 test("cleanupOldFiles never removes registered products, however old", async (t) => {
@@ -75,9 +96,10 @@ test("purgeRuntimeDirsSync wipes and recreates instance dirs", async (t) => {
 
 test("purgeStaleRuntimeDirs reclaims old sibling instance dirs only", async (t) => {
   const parent = await scratchDir(t, "stale-parent");
-  const current = path.join(parent, "fm-runtime-9999");
-  const stale = path.join(parent, "fm-runtime-1111");
-  const fresh = path.join(parent, "fm-runtime-2222");
+  const [stalePid, freshPid] = await exitedRuntimePids();
+  const current = path.join(parent, `fm-runtime-${process.pid}`);
+  const stale = path.join(parent, `fm-runtime-${stalePid}`);
+  const fresh = path.join(parent, `fm-runtime-${freshPid}`);
   const foreign = path.join(parent, "something-else");
   for (const dir of [current, stale, fresh, foreign]) await fsp.mkdir(dir);
   await fsp.writeFile(path.join(stale, "leftover.bin"), "x");
@@ -86,7 +108,7 @@ test("purgeStaleRuntimeDirs reclaims old sibling instance dirs only", async (t) 
   await purgeStaleRuntimeDirs({ runtimeDir: current });
   assert.ok(fs.existsSync(current));
   assert.equal(fs.existsSync(stale), false, "stale sibling must be reclaimed");
-  assert.ok(fs.existsSync(fresh));
+  assert.ok(fs.existsSync(fresh), "recent exited-instance residue stays inside the grace period");
   assert.ok(fs.existsSync(foreign), "non-matching dirs are never touched");
 });
 
@@ -116,4 +138,22 @@ test("purgeStaleRuntimeDirs never treats arbitrary prefix matches as owned insta
   assert.ok(fs.existsSync(backup));
   await purgeStaleRuntimeDirs({ runtimeDir: path.join(parent, "fm-runtime") });
   assert.ok(fs.existsSync(backup), "an unscoped standalone runtime must not sweep siblings");
+});
+
+test("stale cleanup immediately reclaims a marked dead PID but preserves invalid identity and live owners", async t => {
+  const parent=await scratchDir(t,"shutdown-reclaim");
+  const [deadPid,otherPid]=await exitedRuntimePids();
+  const current=path.join(parent,'fm-runtime-99999999');await fsp.mkdir(current);
+  const marker=require('../desktop-shutdown').PENDING_CLEANUP_FILE;
+  const fixtures=[[deadPid,true],[otherPid,false],[process.pid,true]];
+  for(const [pid,valid] of fixtures){
+    const dir=path.join(parent,`fm-runtime-${pid}`);await fsp.mkdir(dir);
+    const stat=await fsp.lstat(dir);
+    await fsp.writeFile(path.join(dir,marker),JSON.stringify({schema:1,pid,dev:stat.dev,ino:valid?stat.ino:-1}));
+    await fsp.writeFile(path.join(dir,'keep-or-reclaim'),'fixture');
+  }
+  await purgeStaleRuntimeDirs({runtimeDir:current});
+  assert.equal(fs.existsSync(path.join(parent,`fm-runtime-${deadPid}`)),false);
+  assert.equal(fs.existsSync(path.join(parent,`fm-runtime-${otherPid}`)),true);
+  assert.equal(fs.existsSync(path.join(parent,`fm-runtime-${process.pid}`)),true);
 });

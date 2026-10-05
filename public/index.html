@@ -56,16 +56,17 @@
           <section class="drop-panel" data-i18n-aria="upload.aria" aria-label="上传文件">
             <input id="fileInput" type="file" class="sr-only" multiple>
             <input id="folderInput" type="file" class="sr-only" webkitdirectory>
-            <button class="drop-zone" id="dropZone" type="button">
+            <div class="drop-zone" id="dropZone" role="button" tabindex="0" data-i18n-aria="upload.dropAria" aria-label="选择文件">
               <span class="mouse-stage" aria-hidden="true">
                 <img class="mouse-mascot" id="mouseMascot" src="/assets/mouse-format/mouse-upload.png" alt="">
               </span>
               <span class="drop-main" data-i18n="upload.title">把文件丢给鼠鼠</span>
               <span class="drop-sub" id="dropHint" data-i18n="upload.hint">图片、文档、PDF、WPS、音视频都可以试</span>
-              <span class="drop-folder-line">
-                <button class="ghost-button" id="chooseFolderButton" type="button" data-i18n="upload.chooseFolder">选择文件夹转 PDF</button>
-              </span>
-            </button>
+            </div>
+            <div class="drop-folder-line">
+              <button class="ghost-button" id="chooseFilesButton" type="button" data-i18n="upload.chooseFiles">选择文件</button>
+              <button class="ghost-button" id="chooseFolderButton" type="button" data-i18n="upload.chooseFolder">选择文件夹转 PDF</button>
+            </div>
 
             <div class="file-strip" id="fileStrip" hidden>
               <div>
@@ -85,6 +86,18 @@
               </select>
             </label>
             <p class="format-hint" id="pdfExcelHint" data-i18n="pdfExcel.hint" hidden>适合电子版规则表格；扫描件、复杂表头和合并单元格可能不完整。</p>
+
+            <div class="field" id="textEncodingField" hidden>
+              <label for="textEncoding" data-i18n="textEncoding.label">源文件编码</label>
+              <select id="textEncoding" aria-describedby="textEncodingHint">
+                <option value="auto" selected data-i18n="textEncoding.auto">自动（UTF-8 / UTF-16 BOM）</option>
+                <option value="utf-8" data-i18n="textEncoding.utf8">UTF-8</option>
+                <option value="gb18030" data-i18n="textEncoding.gb18030">GBK / GB18030</option>
+                <option value="utf-16le" data-i18n="textEncoding.utf16le">UTF-16LE</option>
+                <option value="utf-16be" data-i18n="textEncoding.utf16be">UTF-16BE</option>
+              </select>
+              <p class="field-help" id="textEncodingHint" data-i18n="textEncoding.hint">自动仅识别 UTF-8 或带 BOM 的 UTF-16。GBK 文本请手动选择；批量文本使用同一编码。</p>
+            </div>
 
             <label class="field" id="videoCodecField" hidden>
               <span data-i18n="videoCodec.label">视频编码</span>
@@ -112,7 +125,8 @@
             <label class="field" id="pdfActionField" hidden>
               <span data-i18n="pdfAction.label">PDF 操作</span>
               <select id="pdfAction">
-                <option value="" data-i18n="pdfAction.split">拆分 PDF（默认）</option>
+                <option value="merge" data-i18n="pdfAction.merge" hidden disabled>合并为一个 PDF</option>
+                <option value="" data-i18n="pdfAction.split" selected>拆分 PDF（输出 ZIP）</option>
                 <option value="encrypt" data-i18n="pdfAction.encrypt">加密 PDF</option>
                 <option value="decrypt" data-i18n="pdfAction.decrypt">解密 PDF</option>
               </select>
@@ -147,6 +161,11 @@
               <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-i18n-aria="progress.label" aria-label="转换进度">
                 <div class="progress-fill" id="progressFill"></div>
               </div>
+              <div class="progress-details" id="progressDetails"></div>
+              <div class="progress-summary">
+                <span id="progressBatch"></span>
+                <span id="progressElapsed" role="timer" aria-live="off"></span>
+              </div>
             </div>
 
             <div class="status-box" id="statusBox" role="status" data-i18n="status.ready">选择文件后会显示可用的转换格式。</div>
@@ -177,18 +196,6 @@
         <button class="ghost-button preview-close" id="previewClose" type="button" data-i18n-aria="preview.close" aria-label="关闭预览">×</button>
       </div>
       <div class="preview-content" id="previewContent"></div>
-    </aside>
-
-    <aside class="sponsor-widget" id="sponsorWidget" data-i18n-aria="sponsor.aria" aria-label="支持鼠鼠">
-      <button class="sponsor-toggle" id="sponsorToggle" type="button" data-i18n-title="sponsor.aria" title="支持鼠鼠" aria-expanded="false">
-        <img class="sponsor-mouse" src="/assets/mouse-format/mouse-idle.png" alt="🐭">
-      </button>
-      <div class="sponsor-panel" id="sponsorPanel" hidden>
-        <button class="sponsor-close" id="sponsorClose" type="button" data-i18n-aria="sponsor.close" aria-label="收起">×</button>
-        <p class="sponsor-title" data-i18n="sponsor.title">请鼠鼠吃小鱼干 🐟</p>
-        <p class="sponsor-sub" data-i18n="sponsor.description">如果飞鼠格式帮到了你，欢迎请鼠鼠吃根小鱼干～纯自愿，软件永远免费</p>
-        <img class="sponsor-qr" src="/assets/sponsor-qr.jpg" data-i18n-alt="sponsor.qrAlt" alt="微信收款码">
-      </div>
     </aside>
 
     <script src="/i18n.js"></script>

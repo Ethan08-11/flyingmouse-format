@@ -6,8 +6,9 @@ const { test } = require("node:test");
 
 const source = fs.readFileSync(path.join(__dirname, "..", "public", "app.js"), "utf8");
 const resetSource = source.slice(source.indexOf("function resetDownload()"), source.indexOf("let capabilityRefreshTimer;"));
+const targetLabelSource = source.slice(source.indexOf("function targetFormatLabel("), source.indexOf("function commonTargetsFrom("));
 const conversionSource = source.slice(source.indexOf("async function acceptFiles("), source.indexOf("async function saveResult("));
-const selectionEvents = source.slice(source.indexOf('dropZone.addEventListener("click"'), source.indexOf('batchList.addEventListener("click"'));
+const selectionEvents = source.slice(source.indexOf("function openFilePicker("), source.indexOf('batchList.addEventListener("click"'));
 
 function deferred() {
   let resolve, reject;
@@ -21,24 +22,24 @@ function harness({ targets, convert } = {}) {
   const statuses = [], convertedNames = [], forms = [];
   const element = () => ({ hidden: false, disabled: false, value: "", textContent: "", options: [],
     listeners: {}, addEventListener(name, callback) { this.listeners[name] = callback; }, click() { this.clickCount = (this.clickCount || 0) + 1; },
-    removeAttribute() {}, replaceChildren() { this.options = []; this.value = ""; },
+    remove() {}, removeAttribute() {}, replaceChildren() { this.options = []; this.value = ""; },
     append(option) { this.options.push(option); if (!this.value) this.value = option.value; },
     setAttribute() {}, classList: { add() {}, remove() {} } });
   const context = vm.createContext({
-    state, i18n: { language: "en-US" }, t: key => key, statuses,
-    setStatus(message, type) { statuses.push({ message, type }); },
+    state, performance, i18n: { language: "en-US" }, t: key => key, statuses,
+    setStatus(message, type) { statuses.push({ message: typeof message === "function" ? message() : message, type }); },
     loadTargets: file => targets ? targets(file) : Promise.resolve({ category: "text", targets: ["md"] }),
     commonTargetsFrom: infos => infos[0]?.targets.filter(target => infos.every(info => info.targets.includes(target))) || [],
     summarizeFiles: files => ({ name: files.map(file => file.name).join(", "), meta: "" }),
     extensionOf: name => name.split(".").at(-1), preferredTarget: () => null,
     categoryLabel: value => value, isLongTaskTarget: () => false,
-    mouseStateForConversion: () => "converting", maybeShowQqTutorial() {}, rendererLog() {},
+    mouseStateForConversion: () => "converting", rendererLog() {},
     setMouseState() {}, setWorkflowStep() {}, resetProgress() {}, setProgress() {},
-    setIndeterminateProgress() {}, closePreview() {}, renderBatchList() {},
-    syncVideoCodecField() {}, syncPdfActionFields() {}, syncImagePdfModeField() {}, syncPdfExcelHint() {},
+    setStageProgress() {}, beginConversionProgress() {}, finishConversionProgress() {}, closePreview() {}, renderBatchList() {},
+    syncVideoCodecField() {}, syncTextEncodingField() {}, usesTextEncoding:()=>false, syncPdfActionFields() {}, syncImagePdfModeField() {}, syncPdfExcelHint() {},
     setBatchResult(index, patch) { state.batchResults[index] = { ...state.batchResults[index], ...patch }; },
     setSelectPlaceholder(select, value) { select.replaceChildren(); select.value = value; },
-    document: { createElement: () => element() },
+    document: { createElement: () => element(), body: { appendChild() {}, } },
     FormData: class { constructor() { this.fields = new Map(); } append(key, value) { this.fields.set(key, value); } },
     fetch: async (_url, { body }) => {
       const file = body.fields.get("file");
@@ -48,12 +49,20 @@ function harness({ targets, convert } = {}) {
       return { ok: true, text: async () => JSON.stringify(result) };
     }
   });
-  for (const name of ["fileInput", "folderInput", "dropZone", "chooseFolderButton", "clearButton", "fileName", "fileMeta", "fileStrip",
+  for (const name of ["fileInput", "folderInput", "dropZone", "chooseFilesButton", "chooseFolderButton", "clearButton", "fileName", "fileMeta", "fileStrip",
     "batchList", "targetSelect", "convertButton", "downloadButton", "batchSaveButton", "previewButton", "videoCodec", "alphaBackground",
-    "pdfPassword", "pdfAction", "pdfSplitMode", "pdfGroupSize", "imagePdfMode"]) context[name] = element();
+    "pdfPassword", "pdfAction", "pdfSplitMode", "pdfGroupSize", "imagePdfMode", "textEncoding", "textEncodingField"]) context[name] = element();
   context.targetSelect.disabled = true;
   context.convertButton.disabled = true;
-  vm.runInContext(`${resetSource}\n${conversionSource}\n${selectionEvents}`, context);
+  // These cases exercise queue ownership, not the progress service. The full
+  // page ui-progress tests cover the real POST + polling helper separately.
+  context.postConversionWithProgress = async (url, body) => {
+    const response = await context.fetch(url, { method: "POST", body });
+    const result = await context.parseResponse(response);
+    if (!response.ok) throw context.responseError(result, response.status);
+    return result;
+  };
+  vm.runInContext(`${targetLabelSource}\n${resetSource}\n${conversionSource}\n${selectionEvents}`, context);
   return { context, state, statuses, convertedNames, forms, accept: files => context.acceptFiles(files),
     clear: () => context.clearFile(), convert: () => context.convertCurrentFiles() };
 }
@@ -115,8 +124,8 @@ test("conversion freezes selection and format controls until the batch settles",
   const app = harness({ convert: () => pending.promise });
   await app.accept([{ name: "one.txt", size: 1 }]);
   const running = app.convert();
-  const controls = ["fileInput", "folderInput", "dropZone", "chooseFolderButton", "clearButton", "videoCodec", "alphaBackground",
-    "pdfPassword", "pdfAction", "pdfSplitMode", "pdfGroupSize", "imagePdfMode"];
+  const controls = ["fileInput", "folderInput", "dropZone", "chooseFilesButton", "chooseFolderButton", "clearButton", "videoCodec", "alphaBackground",
+    "pdfPassword", "pdfAction", "pdfSplitMode", "pdfGroupSize", "imagePdfMode", "textEncoding"];
   for (const control of controls) assert.equal(app.context[control].disabled, true, control);
   pending.resolve({ fileName: "one.md", downloadUrl: "/downloads/one" });
   await running;

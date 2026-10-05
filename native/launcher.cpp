@@ -131,14 +131,14 @@ int WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int) {
     writeText(log.output.value, line);
     if (checkOnly || repairOnly) writeText(GetStdHandle(STD_OUTPUT_HANDLE), line);
   };
-  record(L"FlyingMouse Format bootstrap " FM_VERSION L" channel=" FM_CHANNEL L" --no-stdio-init");
+  record(L"Owl-style bootstrap " FM_VERSION L" channel=" FM_CHANNEL L" --no-stdio-init");
   record(L"startup-log destination=" + log.destination + L" path=" + log.path);
   wchar_t self[32768];
   const DWORD length = GetModuleFileNameW(nullptr, self, 32768);
   if (!length || length >= 32768) return fail(L"无法定位程序目录。", length ? ERROR_BAD_LENGTH : GetLastError(), quiet);
   std::wstring directory(self, length);
   directory.resize(directory.find_last_of(L"\\/"));
-  const std::wstring runtime = directory + L"\\FlyingMouse Format Runtime.exe";
+  const std::wstring runtime = directory + L"\\Owl-style Runtime.exe";
   for (const auto& required : { runtime, directory + L"\\resources\\app.asar" }) {
     if (GetFileAttributesW(required.c_str()) == INVALID_FILE_ATTRIBUTES) {
       DWORD code = GetLastError();

@@ -63,7 +63,7 @@ test("diagnostics export publishes the whole report before remembering the direc
   assert.equal(result.canceled, false);
   assert.equal(result.filePath, f.destination);
   const report = await fsp.readFile(f.destination, "utf8");
-  assert.match(report, /^FlyingMouse Format diagnostics\n/);
+  assert.match(report, /^Owl-style diagnostics\n/);
   assert.match(report, /Recent log \(sanitized\):\n$/);
   assert.equal((await readSettings(f.settingsPath)).lastSaveDirectory, f.root);
   assert.deepEqual((await fsp.readdir(f.root)).sort(), ["existing-report.txt", "settings.json"]);

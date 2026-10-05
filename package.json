@@ -2,8 +2,8 @@
   "name": "flyingmouse-format",
   "version": "0.7.10",
   "private": true,
-  "author": "FlyingMouse Format",
-  "productName": "FlyingMouse Format",
+  "author": "Owl-style",
+  "productName": "Owl-style",
   "engines": {
     "node": ">=18"
   },
@@ -65,7 +65,7 @@
   },
   "build": {
     "appId": "com.flyingmouse.format",
-    "productName": "FlyingMouse Format",
+    "productName": "Owl-style",
     "artifactName": "${productName}-Setup-${version}-${arch}.${ext}",
     "publish": [
       {
@@ -266,7 +266,7 @@
       "identityName": "488B6338.354574AC174AD",
       "publisher": "CN=56D7A4A1-B653-4162-A5E2-7D9B3F3754AD",
       "publisherDisplayName": "牢蜂喜欢开飞机",
-      "displayName": "FlyingMouse Format",
+      "displayName": "Owl-style",
       "languages": [
         "zh-CN",
         "en-US"
@@ -278,7 +278,7 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "FlyingMouse Format"
+      "shortcutName": "Owl-style"
     },
     "beforePack": "scripts/prepare-windows-package.js",
     "afterSign": "scripts/attach-windows-launcher.js"

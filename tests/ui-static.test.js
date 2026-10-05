@@ -32,7 +32,7 @@ test("renderer exposes workflow hooks and drop zone copy", () => {
     assert.match(html, new RegExp(`data-step="${step}"`), `${step} workflow step is missing`);
   }
   assert.match(html, /id="dropZone"/);
-  assert.match(html, /把文件丢给鼠鼠|Drop files here/);
+  assert.match(html, /把文件丢给猫头鹰|Drop files to Owl/);
   assert.match(html, /id="dropHint"/);
 });
 

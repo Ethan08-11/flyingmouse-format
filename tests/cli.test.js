@@ -16,7 +16,7 @@ test("CLI accepts leading help flags with successful output and no conversion se
       encoding: "utf8", timeout: 10000
     });
     assert.equal(result.status, 0, result.stderr);
-    assert.match(result.stdout, /^FlyingMouse Format CLI/);
+    assert.match(result.stdout, /^Owl-style CLI/);
     assert.doesNotMatch(result.stderr, /requires at least|Unknown command|Server started/);
   }
 });

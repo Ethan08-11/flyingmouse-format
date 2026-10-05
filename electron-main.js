@@ -68,7 +68,7 @@ try {
   const detail = `无法准备配置或日志目录；应用已停止启动，未切换到备用配置。\nCould not prepare the selected profile or log directory. Startup stopped without switching to another profile.\n\n${error?.path || startupPath}\n${error?.code || "STARTUP_PROFILE_ERROR"}: ${error?.message || error}`;
   console.error(detail);
   try {
-    if (!cliMode) dialog.showErrorBox("飞鼠格式启动失败 / FlyingMouse Format could not start", detail);
+    if (!cliMode) dialog.showErrorBox("Owl-style 启动失败 / Owl-style could not start", detail);
   } finally {
     app.exit(1);
   }
@@ -99,7 +99,7 @@ function createWindow(url) {
     height: 820,
     minWidth: 900,
     minHeight: 640,
-    title: "FlyingMouse Format",
+    title: "Owl-style",
     backgroundColor: "#f6f3ee",
     autoHideMenuBar: true,
     webPreferences: {
@@ -116,7 +116,7 @@ function createWindow(url) {
       appId: "com.flyingmouse.format",
       appIconPath: launcher,
       relaunchCommand: `"${launcher}"`,
-      relaunchDisplayName: "FlyingMouse Format"
+      relaunchDisplayName: "Owl-style"
     });
   }
 
@@ -218,7 +218,7 @@ async function boot() {
   // 第二个实例直接退出，聚焦已有窗口。
   const gotLock = app.requestSingleInstanceLock();
   if (!gotLock) {
-    log("Another FlyingMouse Format instance is running; quitting this one");
+    log("Another Owl-style instance is running; quitting this one");
     app.quit();
     return;
   }
@@ -240,7 +240,7 @@ async function boot() {
   server = started.server;
   if (desktopShutdown.isStopping()) { server.close(); server.closeAllConnections?.(); return; }
   serverUrl = started.url;
-  console.log(`FlyingMouse Format started at ${started.url}`);
+  console.log(`Owl-style started at ${started.url}`);
   log(`Server started at ${started.url}`);
   createWindow(started.url);
   // Worker-based preparation allows both rendering and non-Office conversion
@@ -253,7 +253,7 @@ function bundledSkillSource() {
 }
 
 function currentCliLauncher() {
-  const bootstrap = path.join(path.dirname(process.execPath), "FlyingMouse Format.exe");
+  const bootstrap = path.join(path.dirname(process.execPath), "Owl-style.exe");
   return {
     executable: app.isPackaged && process.platform === "win32" && fs.existsSync(bootstrap)
       ? bootstrap : process.execPath,
@@ -281,7 +281,7 @@ ipcMain.handle("install-agent-skill", async (event, payload) => {
     defaultId: 0,
     cancelId: 1,
     title: "接入 Agent / Connect to Agent",
-    message: "将安装或更新 FlyingMouse Format skill",
+    message: "将安装或更新 Owl-style skill",
     detail: `应用会把轻量 skill 写入以下已存在的目录，并记录当前程序的 CLI 路径：\n\n${targetNames}`,
     noLink: true
   });
@@ -512,7 +512,7 @@ if (cliMode) {
   app.whenReady().then(boot).catch((error) => {
     log("Boot failed", error);
     console.error(error);
-    dialog.showErrorBox("飞鼠格式启动失败 / FlyingMouse Format could not start",
+    dialog.showErrorBox("Owl-style 启动失败 / Owl-style could not start",
       `应用未能启动，请保留以下日志并检查安装是否完整。\nThe app could not start. Keep this log and check that installation completed.\n\n${logger.getLogFile()}\n\n${error?.message || error}`);
     app.quit();
   });

@@ -33,8 +33,8 @@ module.exports = async function attachWindowsLauncher(context) {
   if (context.packager.config.win?.signExecutable !== false) {
     throw new Error("The compatibility launcher currently requires an unsigned build (signExecutable:false).");
   }
-  const entry = path.join(context.appOutDir, "FlyingMouse Format.exe");
-  const runtime = path.join(context.appOutDir, "FlyingMouse Format Runtime.exe");
+  const entry = path.join(context.appOutDir, `${manifest.productName}.exe`);
+  const runtime = path.join(context.appOutDir, `${manifest.productName} Runtime.exe`);
   if (!fs.existsSync(entry) || fs.existsSync(runtime)) throw new Error("Expected one fresh Electron executable.");
   const build = fs.mkdtempSync(path.join(path.dirname(context.appOutDir), "native-launcher-"));
   const local = context.packager.config.extraMetadata?.flyingMouseLocalAudio ?? manifest.flyingMouseLocalAudio ?? false;
@@ -50,8 +50,8 @@ module.exports = async function attachWindowsLauncher(context) {
   fs.writeFileSync(path.join(build, "startup-build.h"), `#pragma once
 #define FM_VERSION L"${manifest.version}"
 #define FM_CHANNEL L"${local ? "local-music" : "public"}"
-#define FM_LOG_FOLDER L"${local ? "FlyingMouse Format Local Music" : "FlyingMouseFormat"}"
-#define FM_TITLE L"飞鼠格式${local ? "（本地音乐版）" : " / FlyingMouse Format"}"
+#define FM_LOG_FOLDER L"${local ? "Owl-style Local Music" : "Owl-style"}"
+#define FM_TITLE L"Owl-style${local ? "（本地音乐版）" : ""}"
 static const std::vector<startup::Resource> FM_STARTUP_RESOURCES = {
 ${resourceEntries.map(item => `  { L${JSON.stringify(item.path)}, ${JSON.stringify(item.sha256)}, ${item.executable} },`).join("\n")}
 };
@@ -76,11 +76,11 @@ BEGIN
   BLOCK "040904b0"
   BEGIN
    VALUE "CompanyName", "LaoFeng (Non-Commercial)\\0"
-   VALUE "FileDescription", "FlyingMouse Format\\0"
+   VALUE "FileDescription", "Owl-style\\0"
    VALUE "FileVersion", "${manifest.version}.0\\0"
-   VALUE "InternalName", "FlyingMouse Format\\0"
-   VALUE "OriginalFilename", "FlyingMouse Format.exe\\0"
-   VALUE "ProductName", "FlyingMouse Format\\0"
+   VALUE "InternalName", "${manifest.productName}\\0"
+   VALUE "OriginalFilename", "${manifest.productName}.exe\\0"
+   VALUE "ProductName", "${manifest.productName}\\0"
    VALUE "ProductVersion", "${manifest.version}\\0"
   END
  END

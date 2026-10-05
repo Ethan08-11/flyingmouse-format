@@ -95,8 +95,8 @@ async function createOcrWorker() {
   ownedTasks.assertAccepting();
   if (!ocrAvailable()) {
     throw ocrError("OCR_ENGINE_UNAVAILABLE",
-      "OCR 引擎或中英文语言文件缺失，请修复或重新安装飞鼠格式。",
-      "The OCR engine or Chinese/English language files are missing. Repair or reinstall FlyingMouse Format.");
+      "OCR 引擎或中英文语言文件缺失，请修复或重新安装 Owl-style。",
+      "The OCR engine or Chinese/English language files are missing. Repair or reinstall Owl-style.");
   }
 
   const { createWorker } = loadTesseract();

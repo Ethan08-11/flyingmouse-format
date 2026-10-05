@@ -115,7 +115,7 @@ const { LANGUAGE_STORAGE_KEY, createI18n } = window.FlyingMouseI18n;
 
 const messages = {
   "zh-CN": {
-    "workspace.aria": "文件转换工作台", "brand.title": "鼠鼠帮你把文件转成需要的格式",
+    "workspace.aria": "文件转换工作台", "brand.title": "猫头鹰帮你把文件转成需要的格式",
     "brand.usage": "仅供个人免费使用，禁止商业售卖/转卖/套壳 · 仅支持普通音乐格式转换，不支持其他音乐平台的加密特殊格式 · 请支持正版音乐",
     "language.label": "语言", "health.checking": "正在检测转换引擎", "health.failed": "检测失败",
     "theme.label": "外观", "theme.system": "跟随系统", "theme.light": "浅色", "theme.dark": "深色",
@@ -131,7 +131,7 @@ const messages = {
     "preview.tooLarge": "文本文件超过 2 MB，为避免界面卡顿，请保存后查看。", "preview.failed": "预览失败：{message}",
     "workflow.aria": "转换流程", "workflow.select": "选择文件", "workflow.analyze": "识别格式",
     "workflow.convert": "开始转换", "workflow.save": "保存结果", "upload.aria": "上传文件",
-    "upload.title": "把文件丢给鼠鼠", "upload.hint": "图片、文档、PDF、WPS、音视频都可以试",
+    "upload.title": "把文件丢给猫头鹰", "upload.hint": "图片、文档、PDF、WPS、音视频都可以试",
     "upload.chooseFiles": "选择文件", "upload.chooseFolder": "选择文件夹转 PDF", "upload.dropAria": "选择文件",
     "upload.limited": "PDF 表格可以转 Excel；Office/WPS 需要内置 LibreOffice",
     "upload.markdownLimited": "Markdown 转 Word/PDF 暂不可用：文档引擎缺失或无法启动，请修复安装。",
@@ -164,7 +164,7 @@ const messages = {
     "tutorial.gotIt": "我知道了"
   },
   "en-US": {
-    "workspace.aria": "File conversion workspace", "brand.title": "Let Mouse convert files into the format you need",
+    "workspace.aria": "File conversion workspace", "brand.title": "Let Owl convert files into the format you need",
     "brand.usage": "Free for personal use; commercial sale, resale and rebranding are prohibited · Supports standard audio formats; encrypted music-service formats are unsupported · Please support licensed music",
     "language.label": "Language", "health.checking": "Checking conversion engines", "health.failed": "Check failed",
     "theme.label": "Appearance", "theme.system": "System", "theme.light": "Light", "theme.dark": "Dark",
@@ -180,7 +180,7 @@ const messages = {
     "preview.tooLarge": "This text file is larger than 2 MB. Save it to view without slowing the app.", "preview.failed": "Preview failed: {message}",
     "workflow.aria": "Conversion workflow", "workflow.select": "Select files", "workflow.analyze": "Detect format",
     "workflow.convert": "Convert", "workflow.save": "Save results", "upload.aria": "Upload files",
-    "upload.title": "Drop files to Mouse", "upload.hint": "Try images, documents, PDF, WPS, audio, or video",
+    "upload.title": "Drop files to Owl", "upload.hint": "Try images, documents, PDF, WPS, audio, or video",
     "upload.chooseFiles": "Choose files", "upload.chooseFolder": "Choose folder → PDF", "upload.dropAria": "Choose files",
     "upload.limited": "PDF tables can be converted to Excel; Office/WPS needs bundled LibreOffice",
     "upload.markdownLimited": "Markdown to Word/PDF is unavailable: the document engine is missing or cannot start. Repair the installation.",

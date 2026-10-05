@@ -69,7 +69,7 @@ function createDesktopRecovery({ window, url, dialog, shell, log, logPath, timeo
     let retry = false;
     try {
       const result = await dialog.showMessageBox(window, {
-        type: 'error', title: 'FlyingMouse Format',
+        type: 'error', title: 'Owl-style',
         message: '界面暂时无法使用 / The app interface is unavailable',
         detail: `可以重试打开界面。正在进行的转换可能需要重新选择文件。\nRetry to reopen the interface; an active conversion may need to be selected again.\n\n${failure.reason}\n\n日志 / Log: ${logPath}`,
         buttons: ['重试 / Retry', '查看日志 / Open log', '关闭 / Close'],
@@ -85,7 +85,7 @@ function createDesktopRecovery({ window, url, dialog, shell, log, logPath, timeo
       } else window.close();
     } catch (error) {
       log('Desktop recovery prompt failed', error);
-      if (alive()) dialog.showErrorBox?.('FlyingMouse Format', `界面启动失败 / Interface startup failed\n${observedFailure.reason}\n${logPath}`);
+      if (alive()) dialog.showErrorBox?.('Owl-style', `界面启动失败 / Interface startup failed\n${observedFailure.reason}\n${logPath}`);
       return;
     } finally { promptOpen = false; }
     if (retry && alive()) {

@@ -19,7 +19,7 @@ const VALUE_OPTIONS = new Map([
   ["--password", "password"]
 ]);
 
-const HELP = `FlyingMouse Format CLI
+const HELP = `Owl-style CLI
 
 Usage:
   flyingmouse-format capabilities [--json]
@@ -39,8 +39,8 @@ Options:
   -h, --help                  Show this help
 
 Packaged app:
-  macOS: "FlyingMouse Format.app/Contents/MacOS/FlyingMouse Format" --cli ...
-  Windows: "FlyingMouse Format.exe" --cli ...
+  macOS: "Owl-style.app/Contents/MacOS/Owl-style" --cli ...
+  Windows: "Owl-style.exe" --cli ...
 
 License: Non-Commercial — personal use only. Commercial resale or rebranding is prohibited.
 `;

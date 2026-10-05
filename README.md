@@ -1,8 +1,8 @@
-# FlyingMouse Format / 飞鼠格式
+# Owl-style
 
-> **0.7.10 Windows 公开版 / Windows release**：修复大 TXT 转 EPUB 资源暴涨、混合 PDF 漏页和结果保存问题，增加真实耗时与阶段进度。此次提供 Windows 10/11 x64 完整版；Microsoft Store 状态独立核对。见 [版本说明 / Release notes](docs/release-notes-0710.md)。
+> **0.7.10 Windows 公开版 / Windows release**：离线文件格式转换。此次提供 Windows 10/11 x64 完整版。
 
-> A mouse-themed, offline Windows file converter. / 一款鼠鼠主题、可离线使用的 Windows 文件格式转换工具。
+> An owl-themed, offline Windows file converter. / 一款猫头鹰主题、可离线使用的 Windows 文件格式转换工具。
 
 > **作者 Author：牢蜂（LaoFeng）**
 >
@@ -15,13 +15,13 @@
 
 [下载 Windows 0.7.10 / Download](https://github.com/LaoFeng-mouse/flyingmouse-format/releases/download/v0.7.10/FlyingMouse-Format-Setup-0.7.10-x64.exe) · [版本详情 / Release](https://github.com/LaoFeng-mouse/flyingmouse-format/releases/tag/v0.7.10) · [问题反馈 / Issues](https://github.com/LaoFeng-mouse/flyingmouse-format/issues)
 
-![FlyingMouse Format mouse UI](public/assets/screenshots/home.png)
+![Owl-style](public/assets/owl-style/owl.png)
 
 ## 中文
 
 ### 主要功能
 
-- 鼠鼠原版界面：鼠鼠会跟随上传、识别、批量、OCR、转换成功或失败切换状态。
+- 猫头鹰界面：猫头鹰会跟随上传、识别、批量、OCR、转换成功或失败切换状态。
 - 本地离线转换：Windows 完整版内置 FFmpeg、LibreOffice、Poppler、Tesseract 和 Pandoc。AV3A 和平台加密音频不在当前支持范围内。
 - 支持图片、文本、Word/WPS、Excel/WPS、PPT/WPS、PDF、音频、视频和 ZIP。
 - 音频转换：支持 MP3 / WAV / FLAC / M4A / AAC / OGG / OPUS / WMA 等普通格式互转；**不支持其他音乐平台的加密特殊格式**（如 NCM / KGG / mflac / kgma / kwm 等）。
@@ -81,7 +81,7 @@ node cli.js images-to-pdf 1.jpg 2.jpg --output album.pdf --json
 node cli.js merge-pdfs a.pdf b.pdf --output merged.pdf --json
 ```
 
-安装版也可直接调用应用入口：macOS 使用 `FlyingMouse Format.app/Contents/MacOS/FlyingMouse Format --cli ...`，Windows 使用 `FlyingMouse Format.exe --cli ...`。在软件顶部点击“接入 Agent”，会检索已存在的 `~/.codex/skills`、`~/.claude/skills`、`~/.agents/skills`（Windows 对应用户目录）并在确认后安装或更新 skill；不会自动创建未安装产品的目录。
+安装版也可直接调用应用入口：macOS 使用 `Owl-style.app/Contents/MacOS/Owl-style --cli ...`，Windows 使用 `Owl-style.exe --cli ...`。在软件顶部点击“接入 Agent”，会检索已存在的 `~/.codex/skills`、`~/.claude/skills`、`~/.agents/skills`（Windows 对应用户目录）并在确认后安装或更新 skill；不会自动创建未安装产品的目录。
 
 运行测试与打包：
 
@@ -105,7 +105,7 @@ npm run dist
 
 ### Highlights
 
-- Original mouse UI with animated state changes for upload, detection, batch work, OCR, success, and errors.
+- Original owl UI with animated state changes for upload, detection, batch work, OCR, success, and errors.
 - Fully local conversion with bundled FFmpeg, LibreOffice, Poppler, and Tesseract. AV3A and platform-encrypted audio are not supported inputs.
 - Converts images, text, Word/WPS, Excel/WPS, PPT/WPS, PDF, audio, video, and ZIP files.
 - Audio conversion between ordinary formats: MP3 / WAV / FLAC / M4A / AAC / OGG / OPUS / WMA. **Encrypted special formats from music platforms (NCM / KGG / mflac / kgma / kwm etc.) are NOT supported.**
@@ -156,7 +156,7 @@ node cli.js images-to-pdf 1.jpg 2.jpg --output album.pdf --json
 node cli.js merge-pdfs a.pdf b.pdf --output merged.pdf --json
 ```
 
-Packaged builds accept the same commands after `--cli`: use `FlyingMouse Format.app/Contents/MacOS/FlyingMouse Format --cli ...` on macOS or `FlyingMouse Format.exe --cli ...` on Windows. “Connect to Agent” discovers existing Codex, Claude, and generic Agent skill directories and installs the bundled lightweight wrapper after confirmation.
+Packaged builds accept the same commands after `--cli`: use `Owl-style.app/Contents/MacOS/Owl-style --cli ...` on macOS or `Owl-style.exe --cli ...` on Windows. “Connect to Agent” discovers existing Codex, Claude, and generic Agent skill directories and installs the bundled lightweight wrapper after confirmation.
 
 ### Platforms and distribution
 

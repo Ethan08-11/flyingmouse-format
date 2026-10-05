@@ -17,8 +17,8 @@ async function desktop(t, options = {}) {
   const appData = path.join(scratch, "Roaming");
   const localProfile = path.join(appData, "FlyingMouse Format Local Music");
   const install = path.join(scratch, "应用 空格 & 中文");
-  const launcher = path.join(install, "FlyingMouse Format.exe");
-  const runtime = path.join(install, "FlyingMouse Format Runtime.exe");
+  const launcher = path.join(install, "Owl-style.exe");
+  const runtime = path.join(install, "Owl-style Runtime.exe");
   const skillRoot = path.join(scratch, ".codex", "skills");
   const explicitProfilePath = options.explicitValue ?? (options.explicitPathIsFile ? path.join(scratch, "显式配置 普通文件") : options.explicitProfileDifferent ? path.join(scratch, "显式配置 新目录") : profile);
   await fsp.mkdir(profile, { recursive: true });
